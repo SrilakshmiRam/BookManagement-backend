@@ -76,20 +76,60 @@ app.delete('/books/:id',async(req,res)=>{
 })
 
 
-app.put('/books/:id',async(req,res)=>{
-    const {title,authorId,genreId,pages,publishedDate}=req.body
-    const {id}=req.params
+app.put('/books/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, authorId, genreId, pages, publishedDate } = req.body;
 
-    try{
+    try {
+        // Dynamically build the SET clause
+        const fieldsToUpdate = [];
+        const values = [];
+
+        if (title) {
+            fieldsToUpdate.push('title = ?');
+            values.push(title);
+        }
+        if (authorId) {
+            fieldsToUpdate.push('author_id = ?');
+            values.push(authorId);
+        }
+        if (genreId) {
+            fieldsToUpdate.push('genre_id = ?');
+            values.push(genreId);
+        }
+        if (pages) {
+            fieldsToUpdate.push('pages = ?');
+            values.push(pages);
+        }
+        if (publishedDate) {
+            fieldsToUpdate.push('published_date = ?');
+            values.push(publishedDate);
+        }
+
+        // Check if there are fields to update
+        if (fieldsToUpdate.length === 0) {
+            return res.status(400).json({ message: 'No fields to update' });
+        }
+
+        // Add the book ID to the values array for the WHERE clause
+        values.push(id);
+
+        // Construct the SQL query
         const bookUpdateQuery = `
             UPDATE books 
-            SET title = ?, author_id = ?, genre_id = ?, pages = ?, published_date = ?
+            SET ${fieldsToUpdate.join(', ')}
             WHERE book_id = ?;
         `;
-        await db.run(bookUpdateQuery,[title,authorId,genreId,pages,publishedDate,id])
-        res.status(201).json({message:'book updated successfully'})
-    }catch (e){
-        console.error('Error while inserting', e)
-        res.status(501).json({message:'Failed to update the book'})
+
+        await db.run(bookUpdateQuery, values);
+
+        res.status(200).json({ message: 'Book updated successfully' });
+    } catch (e) {
+        console.error('Error while updating', e);
+        res.status(500).json({ message: 'Failed to update the book' });
     }
-})
+});
+
+
+
+module.exports = app;
