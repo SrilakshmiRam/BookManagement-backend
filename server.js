@@ -123,12 +123,14 @@ app.put('/books/:id', async (req, res) => {
 
         await db.run(bookUpdateQuery, values);
 
-        res.status(200).json({ message: 'Book updated successfully' });
+        // Return status 201 to indicate that the book was successfully updated
+        res.status(201).json({ message: 'book updated successfully' });
     } catch (e) {
         console.error('Error while updating', e);
         res.status(500).json({ message: 'Failed to update the book' });
     }
 });
+
 
 
 
