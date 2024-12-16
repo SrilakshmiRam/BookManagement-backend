@@ -10,7 +10,7 @@ let db=null
 
 app.use(cors(
     {
-        origin:'https://book-management-frontend-beta.vercel.app',
+        origin:'https://book-management-frontend-2829.vercel.app',
         methods:['GET','POST','PUT','DELETE'],
         allowedHeaders:['Content-Type']
     }
